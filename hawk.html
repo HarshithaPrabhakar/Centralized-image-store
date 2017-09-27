@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Listing cloud images</title>
+<link rel="stylesheet" type="text/css" href="BS/css/bootstrap.min.css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="BS/js/bootstrap.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<style>
+table, th, td {
+    border: 1px solid black;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td {
+    height: 50px;
+    vertical-align: bottom;
+}
+tr:hover{background-color:#f5f5f5}
+</style>
+<script type="text/javascript">
+cloud_no=1;
+file="";
+function getimages()
+{
+	xhr = new XMLHttpRequest();
+	xhr.onreadystatechange=showimages;
+	xhr.open("GET" , "view.php?req="+"list" , true);
+	xhr.send();
+}
+function showimages()
+{
+	if(xhr.readyState==4 && xhr.status==200)
+	{
+		
+		res=JSON.parse(xhr.responseText);i=0;
+		while(i<2)
+		{
+			if(i==0)
+			{
+				mydiv = document.getElementById("c1");
+				cloud=1;
+				imgs=res[0]["images"];
+				table= document.createElement("table");
+				table.class="table table-bordered";
+				thead= document.createElement("thead");
+				tr=document.createElement("tr");
+				thd1=document.createElement("th");
+				thd1.innerHTML="ID";
+				thd2=document.createElement("th");
+				thd2.innerHTML="Status";
+				thd3=document.createElement("th");
+				thd3.innerHTML="Name";
+				tr.appendChild(thd1);
+				tr.appendChild(thd2);
+				tr.appendChild(thd3);
+				thead.appendChild(tr);
+				table.appendChild(thead);
+				tbody=document.createElement("tbody");
+				for(j=0;j<imgs.length;j++)
+				{
+						status = imgs[j]["status"];
+						name = imgs[j]["name"];
+						
+						id = imgs[j]["id"];
+						tr=document.createElement("tr");
+						td1=document.createElement("td");
+						td1.innerHTML=id;
+						td1.onclick=getdetails;
+						td1.id=id+";"+1;
+						td2=document.createElement("td");
+						td2.innerHTML=status;
+						td3=document.createElement("td");
+						td3.innerHTML=name;
+						tr.appendChild(td1);
+						tr.appendChild(td2);
+						tr.appendChild(td3);
+						tbody.appendChild(tr);
+						table.appendChild(tbody);
+			
+				}
+				mydiv.appendChild(table);
+				mydiv.style.display="block";
+			}
+			if(i==1)
+			{
+				mydiv = document.getElementById("c2");
+				cloud=2;
+				imgs=res[1]["images"];
+				table= document.createElement("table");
+				table.class="table table-bordered";
+				thead= document.createElement("thead");
+				tr=document.createElement("tr");
+				thd1=document.createElement("th");
+				thd1.innerHTML="ID";
+				thd2=document.createElement("th");
+				thd2.innerHTML="Status";
+				thd3=document.createElement("th");
+				thd3.innerHTML="Name";
+				tr.appendChild(thd1);
+				tr.appendChild(thd2);
+				tr.appendChild(thd3);
+				thead.appendChild(tr);
+				table.appendChild(thead);
+				tbody=document.createElement("tbody");
+				for(j=0;j<imgs.length;j++)
+				{
+						status = imgs[j]["status"];
+						name = imgs[j]["name"];
+						
+						id = imgs[j]["id"];
+						tr=document.createElement("tr");
+						td1=document.createElement("td");
+						td1.innerHTML=id;
+						td1.onclick=getdetails;
+						td1.id=id+";2";
+						td2=document.createElement("td");
+						td2.innerHTML=status;
+						td3=document.createElement("td");
+						td3.innerHTML=name;
+						tr.appendChild(td1);
+						tr.appendChild(td2);
+						tr.appendChild(td3);
+						tbody.appendChild(tr);
+						table.appendChild(tbody);
+			
+				}
+				mydiv.appendChild(table);
+				mydiv.style.display="block";
+			}
+			
+			
+			
+			i++;
+		}
+	}
+}
+function getdetails(event)
+{
+	a=event.target;
+	str=a.id.split(";");
+	cloud=str[1];
+	imgid=str[0];
+	alert("Cloud : " +cloud);
+	xhr2=new XMLHttpRequest();
+	xhr2.onreadystatechange=showdetails;
+	xhr2.open("GET" , "view.php?req="+"show"+"&cloud="+cloud+"&imgid="+imgid , true);
+	xhr2.send();
+	cloud_no=cloud;
+}
+function showdetails()
+{
+	if(this.readyState==4 && this.status==200)
+	{
+		res=JSON.parse(this.responseText);
+
+		stat=res["status"];
+		//alert(stat);
+		name=res["name"];
+		format=res["container_format"];
+		size=res["size"];
+		ctime=res["created_at"];
+		mtime=res["updated_at"];
+		p1=document.createElement("p");
+		p1.innerHTML="Image Status : "+stat;
+		p2=document.createElement("p");
+		p2.innerHTML="Image Name : "+name;
+		p3=document.createElement("p");
+		p3.innerHTML="Image Created At : "+ctime;
+		p4=document.createElement("p");
+		p4.innerHTML="Image Updated At : "+mtime;
+		p5=document.createElement("p");
+		p5.innerHTML="Image Size : "+size;
+		p6=document.createElement("p");
+		p6.innerHTML="Image Container Format : "+format;
+		info=document.getElementById("info");
+		info.appendChild(p1);
+		info.appendChild(p2);
+		info.appendChild(p3);
+		info.appendChild(p4);
+		info.appendChild(p5);
+		info.appendChild(p6);
+		info.style.display="block";
+		file=res["file"];
+		//alert("<input type='button' class='btn btn-success' value='download' onclick='getPrey("+cloud_no+","+res["file"]+")'/>");
+		info.innerHTML+="<input type='button' class='btn btn-success' value='download' onclick='getPrey()'/>";
+		/*button=document.createElement("input");
+		button.type="button";
+		alert("getPrey("+cloud_no+","+res["file"]+")");
+		button.onclick="getPrey("+cloud_no+","+res["file"]+")";
+		button.value="Download";
+		button.class="btn btn-success";
+		info.appendChild(button);*/
+		
+		
+	}
+}
+function clearit()
+{
+	info.innerHTML="<button class='btn btn-info' onclick='clearit()''>Clear </button>";
+	info.style.display="none";
+}
+function getPrey(){
+	
+	xhr = new XMLHttpRequest();
+	xhr.onreadystatechange=eatPrey;
+	xhr.open("GET" , "hunt.php?req=fetch&cloud="+cloud_no+"&file="+file , true);
+	xhr.responseType="blob";
+	xhr.send();
+}
+function eatPrey(){
+	alert(this.readyState+" "+this.status);
+	if(this.readyState==4 && this.status==200)
+	{
+		var blob = new Blob([this.response], {type: "application/octet-stream"});
+        var objectUrl = URL.createObjectURL(blob);
+        alert(objectUrl);
+        window.open(objectUrl);
+	}
+}
+</script>
+<body>
+
+<center>
+<p><h1>Openstack Eagle's Eye</h1></p>
+<button class="btn btn-info" onclick="getimages()">Get Images</button>
+</center>
+<div class="container">
+<div id="c1" class="col-sm-6" style="background-color:pink;display:none">
+<h2>Cloud 1 : 10.10.3.11</h2>
+</div>
+<div id="c2" class="col-sm-6" style="background-color:yellow;display:none">
+<h2>Cloud 2 : 10.10.3.16</h2>
+</div>
+<div id="info" style="display:none">
+<button class="btn btn-info" onclick="clearit()">Clear </button>
+</div>
+
+</body>
+</html>
